@@ -1,14 +1,16 @@
 import * as React from 'react';
-import { StyleSheet, Text, View ,TextInput , TouchableOpacity} from 'react-native';
+import { StyleSheet, Text, View ,TextInput , TouchableOpacity, Image} from 'react-native';
 import { Header } from 'react-native-elements'
 import {SafeAreaProvider} from 'react-native-safe-area-context'
+
+import db from './localdb'
 
 export default class App extends React.Component {
   constructor(){
     super()
     this.state = {
       text : '',
-      display : '',
+      chunks : [],
     }
   }
   render() {
@@ -21,6 +23,9 @@ export default class App extends React.Component {
         centerComponent={{ text: 'Monkey Chunky', style: { color: '#fff' } }}
         rightComponent={{ icon: 'home', color: '#fff' }}
       />
+      <Image style = {styles.imageIcon} 
+        source  = {{ uri :  "https://www.shareicon.net/data/128x128/2015/08/06/80805_face_512x512.png"}}/>
+
       <TextInput
         onChangeText = {(info)=>{
           this.setState({
@@ -34,7 +39,7 @@ export default class App extends React.Component {
       style = {styles.goButton}
       onPress = {()=>{
         this.setState({
-          display : this.state.text
+          chunks : db[this.state.text].chunks
         })
       }}>
         <Text style = {styles.buttonText}>Submit</Text>
@@ -42,6 +47,15 @@ export default class App extends React.Component {
       <Text style = {styles.displayText}>
         {this.state.display}
       </Text>
+      <View>
+        {this.state.chunks.map( (item , index) => {
+          return(
+            <TouchableOpacity style = {styles.chunkButton}>
+              <Text style = {styles.displayText}> { item } </Text>
+            </TouchableOpacity>
+          )
+        })}
+      </View>
       </View>
       </SafeAreaProvider>
     );
@@ -77,5 +91,21 @@ const styles = StyleSheet.create({
   displayText: {
     textAlign: 'center',
     fontSize: 30,
+    
   },
+  imageIcon :{
+    width : 150,
+    height : 150 ,
+    marginLeft : 75
+  },
+  chunkButton:{
+    fontSize: 18,
+    fontWeight: 'bold',
+     width: 100,
+    height: 40,
+    alignSelf: 'center',
+    backgroundColor : 'red',
+    margin:20,
+    borderRadius :7,
+  }
 });
