@@ -1,62 +1,78 @@
 import * as React from 'react';
-import { StyleSheet, Text, View ,TextInput , TouchableOpacity, Image} from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, Alert } from 'react-native';
 import { Header } from 'react-native-elements'
-import {SafeAreaProvider} from 'react-native-safe-area-context'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
+import PhonicSoundButton from './components/PhonicSoundButton'
 
 import db from './localdb'
 
 export default class App extends React.Component {
-  constructor(){
+  constructor() {
     super()
     this.state = {
-      text : '',
-      chunks : [],
+      text: '',
+      chunks: [],
+      phonicSounds: '',
     }
   }
   render() {
     return (
       <SafeAreaProvider>
-      <View style={styles.container}>
-        <Header
-        backgroundColor = {"purple"}
-        leftComponent={{ icon: 'menu', color: '#fff', iconStyle: { color: '#fff' } }}
-        centerComponent={{ text: 'Monkey Chunky', style: { color: '#fff' } }}
-        rightComponent={{ icon: 'home', color: '#fff' }}
-      />
-      <Image style = {styles.imageIcon} 
-        source  = {{ uri :  "https://www.shareicon.net/data/128x128/2015/08/06/80805_face_512x512.png"}}/>
+        <View style={styles.container}>
+          <Header
+            backgroundColor={"purple"}
+            leftComponent={{ icon: 'menu', color: '#fff', iconStyle: { color: '#fff' } }}
+            centerComponent={{ text: 'Monkey Chunky', style: { color: '#fff' } }}
+            rightComponent={{ icon: 'home', color: '#fff' }}
+          />
+          <Image style={styles.imageIcon}
+            source={{ uri: "https://www.shareicon.net/data/128x128/2015/08/06/80805_face_512x512.png" }} />
 
-      <TextInput
-        onChangeText = {(info)=>{
-          this.setState({
-            text : info,
-          })
-        }}
-        value = {this.state.text}
-        style = {styles.inputBox} 
-      />
-      <TouchableOpacity 
-      style = {styles.goButton}
-      onPress = {()=>{
-        this.setState({
-          chunks : db[this.state.text].chunks
-        })
-      }}>
-        <Text style = {styles.buttonText}>Submit</Text>
-      </TouchableOpacity>
-      <Text style = {styles.displayText}>
-        {this.state.display}
-      </Text>
-      <View>
-        {this.state.chunks.map( (item , index) => {
-          return(
-            <TouchableOpacity style = {styles.chunkButton}>
-              <Text style = {styles.displayText}> { item } </Text>
-            </TouchableOpacity>
-          )
-        })}
-      </View>
-      </View>
+          <TextInput
+            onChangeText={(info) => {
+              this.setState({
+                text: info,
+              })
+              this.setState({
+                chunks:[],
+              })
+            }}
+            value={this.state.text}
+            style={styles.inputBox}
+          />
+          <TouchableOpacity
+            style={styles.goButton}
+            onPress={() => {
+              var word = this.state.text.toLowerCase().trim()
+              console.log(word)
+              db[word]
+              ?(this.setState({
+                chunks: db[word].chunks
+              }),
+              this.setState({
+                phonicSounds: db[word].phones
+              }))
+              :alert("word does not exist in our database")
+              
+            }}>
+            <Text style={styles.buttonText}>Submit</Text>
+          </TouchableOpacity>
+
+          <View>
+            {this.state.chunks.map((item, index) => {
+              return (
+                <View>
+                  <PhonicSoundButton
+                    wordChunk={this.state.chunks[index]}
+                    soundChunk={this.state.phonicSounds[index]}
+                    buttonIndex={index}
+                  />
+                </View>
+
+              )
+            })}
+          </View>
+        </View>
       </SafeAreaProvider>
     );
   }
@@ -91,21 +107,21 @@ const styles = StyleSheet.create({
   displayText: {
     textAlign: 'center',
     fontSize: 30,
-    
+
   },
-  imageIcon :{
-    width : 150,
-    height : 150 ,
-    marginLeft : 75
+  imageIcon: {
+    width: 150,
+    height: 150,
+    marginLeft: 75
   },
-  chunkButton:{
+  chunkButton: {
     fontSize: 18,
     fontWeight: 'bold',
-     width: 100,
+    width: 100,
     height: 40,
     alignSelf: 'center',
-    backgroundColor : 'red',
-    margin:20,
-    borderRadius :7,
+    backgroundColor: 'red',
+    margin: 20,
+    borderRadius: 7,
   }
 });
